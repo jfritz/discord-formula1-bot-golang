@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -11,7 +12,7 @@ import (
 // Configuration
 var DoRequest bool = true
 var RootDirectory string
-var CalendarFile string = "./formula.1.2019.ics"
+var CalendarFile string = "formula.1.2019.ics"
 var WebhookConfFilename string = "webhook_url.conf"
 
 func main() {
@@ -20,7 +21,13 @@ func main() {
 		url:   getWebhookUrl(WebhookConfFilename),
 	}
 
-	// TODO instantiate calendar obj
+	var cal = F1Calendar{
+		debug:    true,
+		filename: CalendarFile,
+	}
+
+	events := cal.GetEvents(true, "7d")
+	fmt.Println(events)
 
 	// 0 = Sunday, 1 = Monday, ..., 4 = Thursday, 5 = Friday, 6 = Saturday
 	dow := time.Now().Weekday()
