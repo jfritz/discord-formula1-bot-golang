@@ -14,3 +14,9 @@ Thursdays, Fridays, Saturdays, Sundays -
 
 
 Note: This is based off of my Python project, discord-formula1-bot, commit 1eb0c68.
+
+## Requirements
+- Golang system requirements for Golang 1.12 apply: https://github.com/golang/go/wiki/MinimumRequirements
+
+## Installation
+- Place your webhook url as the first line in webhook_url.conf in the same folder as the binary.

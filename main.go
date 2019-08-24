@@ -1,62 +1,40 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
-	"log"
-	"os"
-	"strings"
 	"time"
 )
 
 // Configuration
-var DoRequest bool = true
-var RootDirectory string
+var	debugMode bool = true
 var CalendarFile string = "formula.1.2019.ics"
 var WebhookConfFilename string = "webhook_url.conf"
+var localTimeZone = "America/Chicago"
 
 func main() {
 	var webhook = DiscordWebhook{
-		debug: true,
-		url:   getWebhookUrl(WebhookConfFilename),
+		debug: 		debugMode,
+		configFile: WebhookConfFilename,
 	}
 
 	var cal = F1Calendar{
-		debug:    true,
+		debug:    debugMode,
 		filename: CalendarFile,
 	}
 
-	events := cal.GetEvents(true, "7d")
-	fmt.Println(events)
-
-	// 0 = Sunday, 1 = Monday, ..., 4 = Thursday, 5 = Friday, 6 = Saturday
 	dow := time.Now().Weekday()
 
 	switch dow {
 	case time.Monday:
-		// TODO get next race events and output
+		events := cal.GetEvents(Next7Days)
+		// TODO use SummarizeEvent(e, tz) and build message to send
 		webhook.SendMessage("This is a test message")
 	case time.Thursday, time.Friday, time.Saturday, time.Sunday:
-		// TODO get next 24h of events and output
+		events := cal.GetEvents(Next24Hours)
+		// TODO use SummarizeEvent(e, tz) and build message to send
 		webhook.SendMessage("This is a test message")
+		if dow == time.Friday {
+			// TODO also reminder to update fantasy F1 league
+		}
 	default:
 	}
-}
-
-func getWebhookUrl(confFilename string) string {
-	file, err := os.Open(confFilename)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
-
-	// By design only read the first webhook in the file
-	scanner.Scan()
-
-	if err := scanner.Err(); err != nil {
-		log.Fatal(err)
-	}
-	return strings.TrimSpace(scanner.Text())
 }
