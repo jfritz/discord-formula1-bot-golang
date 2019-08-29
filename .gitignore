@@ -2,3 +2,4 @@
 webhook_url.conf
 
 .idea
+*.exe

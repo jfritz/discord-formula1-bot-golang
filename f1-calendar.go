@@ -10,7 +10,7 @@ import (
 )
 
 type F1Calendar struct {
-	debug bool
+	debug    bool
 	filename string
 }
 
@@ -28,29 +28,29 @@ func friendlyDurationString(duration time.Duration) string {
 
 	daysStr, hoursStr, minutesStr := "", "", ""
 	if days > 0 {
-		daysStr = fmt.Sprintf("%d days", days)
+		daysStr = fmt.Sprintf("%d days,", days)
 	}
 	if hours > 0 {
-		hoursStr = fmt.Sprintf("%d hours", hours)
+		hoursStr = fmt.Sprintf("%d hours,", hours)
 	}
 	if minutes > 0 {
 		minutesStr = fmt.Sprintf("%d minutes", minutes)
 	}
 
-	return strings.Join([]string{daysStr, hoursStr, minutesStr }, ", ")
+	return strings.TrimSpace(strings.Join([]string{daysStr, hoursStr, minutesStr}, " "))
 }
 
 // Returns a human readable string, summarizing the F1 event provided in `event`
 // Time is adjusted to the given `localTimeZone`
-func SummarizeEvent(event gocal.Event, localTimeZone string ) string {
-	localTime,err := time.LoadLocation(localTimeZone)
+func SummarizeEvent(event gocal.Event, localTimeZone string) string {
+	localTime, err := time.LoadLocation(localTimeZone)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	desc := `:arrow_right: **%s @ %s**: 
-- Starts in: **%s**
-- Starts at: **%s**
+	desc := `:arrow_right: **%s** @ %s: 
+- Starts in **%s** at **%s**
+
 `
 	return fmt.Sprintf(desc,
 		event.Summary,
@@ -74,6 +74,7 @@ func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 	c.Parse()
 
 	if cal.debug {
+		fmt.Println("Found events: ")
 		for _, e := range c.Events {
 			fmt.Printf(SummarizeEvent(e, "America/Chicago"))
 		}
@@ -81,4 +82,3 @@ func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 
 	return c.Events
 }
-

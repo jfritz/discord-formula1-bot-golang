@@ -5,14 +5,14 @@ import (
 )
 
 // Configuration
-var	debugMode bool = true
-var CalendarFile string = "formula.1.2019.ics"
-var WebhookConfFilename string = "webhook_url.conf"
+var debugMode = true
+var CalendarFile = "formula.1.2019.ics"
+var WebhookConfFilename = "webhook_url.conf"
 var localTimeZone = "America/Chicago"
 
 func main() {
 	var webhook = DiscordWebhook{
-		debug: 		debugMode,
+		debug:      debugMode,
 		configFile: WebhookConfFilename,
 	}
 
@@ -24,16 +24,42 @@ func main() {
 	dow := time.Now().Weekday()
 
 	switch dow {
+
 	case time.Monday:
+		prefix := "<:f1:436383126743285760> Happy Monday! Here is the schedule for the next race weekend: \n"
+		suffix := "<:nico:436342726309445643>"
 		events := cal.GetEvents(Next7Days)
-		// TODO use SummarizeEvent(e, tz) and build message to send
-		webhook.SendMessage("This is a test message")
+		eventsStr := ""
+
+		for _, event := range events {
+			eventsStr += SummarizeEvent(event, localTimeZone)
+		}
+
+		outputMessage := prefix + eventsStr + suffix
+		if len(events) == 0 {
+			eventsStr = "No events in the next 7 days.\n"
+		}
+		webhook.SendMessage(outputMessage)
+
 	case time.Thursday, time.Friday, time.Saturday, time.Sunday:
+		prefix := "<:f1:436383126743285760> Race Weekend! In the next 24 hours: \n"
+		suffix := "<:nico:436342726309445643>"
 		events := cal.GetEvents(Next24Hours)
-		// TODO use SummarizeEvent(e, tz) and build message to send
-		webhook.SendMessage("This is a test message")
-		if dow == time.Friday {
-			// TODO also reminder to update fantasy F1 league
+		eventsStr := ""
+
+		for _, event := range events {
+			eventsStr += SummarizeEvent(event, localTimeZone)
+		}
+
+		outputMessage := prefix + eventsStr + suffix
+		if len(events) == 0 {
+			eventsStr = "No events in the next 24 hours.\n"
+		}
+		webhook.SendMessage(outputMessage)
+
+		if len(events) > 0 && dow == time.Friday {
+			reminder := "@F1 Fantasy League - It's Friday! Remember to check your F1 fantasy teams!"
+			webhook.SendMessage(reminder)
 		}
 	default:
 	}
