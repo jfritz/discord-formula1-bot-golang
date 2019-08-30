@@ -45,6 +45,7 @@ func friendlyDurationString(duration time.Duration) string {
 func SummarizeEvent(event gocal.Event, localTimeZone string) string {
 	localTime, err := time.LoadLocation(localTimeZone)
 	if err != nil {
+		log.Println("Loading Time Zone")
 		log.Fatal(err)
 	}
 
@@ -74,9 +75,9 @@ func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 	c.Parse()
 
 	if cal.debug {
-		fmt.Println("Found events: ")
+		fmt.Printf("Found %d events: \r\n", len(c.Events))
 		for _, e := range c.Events {
-			fmt.Printf(SummarizeEvent(e, "America/Chicago"))
+			fmt.Printf(SummarizeEvent(e, "Local"))
 		}
 	}
 
