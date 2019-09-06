@@ -62,20 +62,19 @@ func main() {
 		events := cal.GetEvents(Next24Hours)
 		eventsStr := ""
 
-		for _, event := range events {
-			eventsStr += SummarizeEvent(event, localTimeZone)
-		}
+		if len(events) != 0 {
+			for _, event := range events {
+				eventsStr += SummarizeEvent(event, localTimeZone)
+			}
 
-		outputMessage := prefix + eventsStr + suffix
-		if len(events) == 0 {
-			eventsStr = "No events in the next 24 hours.\n"
+			webhook.SendMessage(prefix + eventsStr + suffix)
 		}
-		webhook.SendMessage(outputMessage)
 
 		if len(events) > 0 && dow == time.Friday {
 			reminder := "<@&616676115645202462> - It's Friday! Remember to check your F1 fantasy teams!"
 			webhook.SendMessage(reminder)
 		}
+
 	default:
 	}
 }
