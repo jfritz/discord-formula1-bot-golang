@@ -46,15 +46,13 @@ func main() {
 		events := cal.GetEvents(Next7Days)
 		eventsStr := ""
 
-		for _, event := range events {
-			eventsStr += SummarizeEvent(event, localTimeZone)
-		}
+		if len(events) != 0 {
+			for _, event := range events {
+				eventsStr += SummarizeEvent(event, localTimeZone)
+			}
 
-		outputMessage := prefix + eventsStr + suffix
-		if len(events) == 0 {
-			eventsStr = "No events in the next 7 days.\n"
+			webhook.SendMessage(prefix + eventsStr + suffix)
 		}
-		webhook.SendMessage(outputMessage)
 
 	case time.Thursday, time.Friday, time.Saturday, time.Sunday:
 		prefix := "<:f1:436383126743285760> Race Weekend! In the next 24 hours: \n"
