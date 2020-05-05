@@ -1,7 +1,4 @@
 # discord-formula1-bot-golang
-
-WARNING: This bot is not yet complete.
-
 A simple discord bot to post F1 events using webhooks
 
 This script is designed to be run once every 24 hours.
