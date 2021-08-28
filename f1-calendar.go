@@ -74,6 +74,7 @@ func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 	c.Start, c.End = &start, &end
 	c.Parse()
 
+	// TODO bugfix somehow when events are parsed they assume the time in the ics is UTC.
 	if cal.debug {
 		fmt.Printf("Found %d events: \r\n", len(c.Events))
 		for _, e := range c.Events {
