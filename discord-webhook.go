@@ -44,8 +44,11 @@ func (webhook *DiscordWebhook) getWebhookUrl() string {
 		log.Fatal(err)
 	}
 
+	// Allow comment after the webhook, so throw it away here
+	webhookUrl := strings.Split(scanner.Text(), " ")[0]
+
 	// TODO validation on the webhook URL?
-	return strings.TrimSpace(scanner.Text())
+	return strings.TrimSpace(webhookUrl)
 }
 
 func (webhook *DiscordWebhook) SendMessage(msg string) {
