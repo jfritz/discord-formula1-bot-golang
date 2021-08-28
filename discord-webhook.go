@@ -53,6 +53,9 @@ func (webhook *DiscordWebhook) SendMessage(msg string) {
 	form := url.Values{}
 	form.Add("content", msg)
 	req, err := http.NewRequest("POST", webhook.getWebhookUrl(), strings.NewReader(form.Encode()))
+	if err != nil {
+		log.Fatalf("Couldn't create webhook request: %s", err.Error())
+	}
 
 	for key, value := range WebhookHeaders {
 		req.Header.Add(key, value)

@@ -64,7 +64,7 @@ func SummarizeEvent(event gocal.Event, localTimeZone string) string {
 func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 	f, err := os.Open(cal.filename)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("Couldn't open calendar: %s", err.Error())
 	}
 	defer f.Close()
 
@@ -72,13 +72,16 @@ func (cal *F1Calendar) GetEvents(filter time.Duration) []gocal.Event {
 
 	c := gocal.NewParser(f)
 	c.Start, c.End = &start, &end
-	c.Parse()
+	err = c.Parse()
+	if err != nil {
+		log.Fatalf("Couldn't parse calendar: %s", err.Error())
+	}
 
 	// TODO bugfix somehow when events are parsed they assume the time in the ics is UTC.
 	if cal.debug {
-		fmt.Printf("Found %d events: \r\n", len(c.Events))
+		log.Printf("Found %d events: \r\n", len(c.Events))
 		for _, e := range c.Events {
-			fmt.Printf(SummarizeEvent(e, "Local"))
+			log.Print(SummarizeEvent(e, "Local"))
 		}
 	}
 
