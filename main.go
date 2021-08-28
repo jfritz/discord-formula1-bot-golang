@@ -16,7 +16,7 @@ var debugMode = true
 var localTimeZone = "Local" // "America/Chicago"
 
 var RemoteCalendarUrl = "https://f1calendar.com/download/f1-calendar_p1_p2_p3_q_gp.ics"
-var CalendarFilenameDefault = "formula.1.2020.ics"
+var CalendarFilenameDefault = "formula.1.downloaded.ics"
 var CalendarFilename = flag.String("calendarFile", CalendarFilenameDefault, "A fully qualified or relative path to the .ics file used for events.")
 var WebhookConfFilenameDefault = "webhook_url.conf"
 var WebhookConfFilename = flag.String("webhookFile", WebhookConfFilenameDefault, "A fully qualified or relative path to your webhook_url.conf file. Defaults to webhook_url.conf.")
