@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
+	"net/http"
 	"os"
 	"path/filepath"
 	"time"
@@ -13,6 +15,7 @@ import (
 var debugMode = true
 var localTimeZone = "Local" // "America/Chicago"
 
+var RemoteCalendarUrl = "https://f1calendar.com/download/f1-calendar_p1_p2_p3_q_gp.ics"
 var CalendarFilenameDefault = "formula.1.2020.ics"
 var CalendarFilename = flag.String("calendarFile", CalendarFilenameDefault, "A fully qualified or relative path to the .ics file used for events.")
 var WebhookConfFilenameDefault = "webhook_url.conf"
@@ -20,6 +23,16 @@ var WebhookConfFilename = flag.String("webhookFile", WebhookConfFilenameDefault,
 
 func main() {
 	findValidConfigFiles(CalendarFilename, WebhookConfFilename)
+
+	// Attmept download file and use that instead
+	var RemoteCalendarFileDownloadLocation = "formula.1.downloaded.ics"
+	err := downloadFile(RemoteCalendarFileDownloadLocation, RemoteCalendarUrl)
+	if err != nil {
+		log.Printf("Couldn't download fresh calendar file: %s", err.Error())
+	} else {
+		log.Printf("Using downloaded file %s", RemoteCalendarFileDownloadLocation)
+		*CalendarFilename = RemoteCalendarFileDownloadLocation
+	}
 
 	var webhook = DiscordWebhook{
 		debug:      debugMode,
@@ -139,4 +152,39 @@ func isValidFile(filename string) bool {
 		ret = false
 	}
 	return ret
+}
+
+func downloadFile(filepath string, url string) error {
+	response, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+
+	defer func(body io.ReadCloser) {
+		err := body.Close()
+		if err != nil {
+			fmt.Printf("Error trying to close download stream %s: %s", err.Error(), url)
+			return
+		}
+	}(response.Body)
+
+	outfile, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+
+	defer func(outfile *os.File) {
+		err := outfile.Close()
+		if err != nil {
+			panic(fmt.Sprintf("Error trying to close local file %s: %s", err.Error(), url))
+		}
+	}(outfile)
+
+	// Write the file
+	_, err = io.Copy(outfile, response.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
